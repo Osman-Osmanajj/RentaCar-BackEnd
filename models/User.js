@@ -1,42 +1,45 @@
-const { Sequelize, Model, DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+'use strict';
+import { Model, DataTypes } from 'sequelize';
 
-class User extends Model {}  // Kjo duhet të zgjerojë Model, jo 'models'
-
-User.init(
-  {
-    userid: {
-      type: DataTypes.INTEGER,
-      primaryKey: true, 
-      autoIncrement: true
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true 
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true 
-        }
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
+export default (sequelize) => {
+  class User extends Model {
+    static associate(models) {
+      // Define associations here
+      User.belongsTo(models.Tenant, { foreignKey: 'tenant_id' });
     }
-  },
-  {
-    sequelize, 
-    modelName: "user", 
-    timestamps: true 
   }
-);
 
-module.exports = User;
+  User.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false
+      },
+      password: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      role: {
+        type: DataTypes.ENUM('Admin', 'Customer', 'Manager'),
+        allowNull: false
+      },
+      tenant_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      }
+    },
+    {
+      sequelize,
+      modelName: 'User',
+      tableName: 'users',
+      underscored: true
+    }
+  );
+
+  return User;
+};
