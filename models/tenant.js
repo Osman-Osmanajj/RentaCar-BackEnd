@@ -1,46 +1,61 @@
-import { Sequelize, DataTypes } from 'sequelize';
-import { sequelize } from '../config/database.js';
+'use strict';
+import { Model, DataTypes } from 'sequelize';
 
-const Tenant = sequelize.define('tenant', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    unique: true,
-    allowNull: false,
-  },
-  phone: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  address: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  city: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  country: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  schema_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
+export default (sequelize) => {
+  class Tenant extends Model {
+    static associate(models) {
+      Tenant.hasMany(models.UsersAdmin, {
+        foreignKey: 'tenantid',
+        onDelete: 'CASCADE',
+      });
+    }
   }
-});
 
+  Tenant.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      city: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      country: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      schema_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+    },
+    {
+      sequelize,
+      modelName: 'Tenant',
+      tableName: 'tenants',
+      underscored: true,
+    }
+  );
 
-Tenant.associate = function (models) {
-  Tenant.hasMany(models.User, {
-    foreignKey: 'tenant_id',
-    onDelete: 'CASCADE',
-  });
+  return Tenant;
 };
-
-
-export default Tenant;
