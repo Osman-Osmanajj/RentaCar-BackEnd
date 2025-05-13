@@ -1,37 +1,46 @@
-import Tenant from '../models/tenant.js';
 import { sequelize } from '../config/database.js';
+import { PublicModelService } from '../services/PublicModelService.js';
 
-const createTenant = async (req, res) => {
-  try {
-    const { name, email, phone, address, city, country } = req.body;
-
-    const schema_name = `tenant_${name.toLowerCase().replace(/\s+/g, '_')}`;
-
-    const tenant = await Tenant.create({
-      name,
-      email,
-      phone,
-      address,
-      city,
-      country,
-      schema_name
-    });
-
+class TenantController {
+  async createTenant(req, res) {
     try {
+      const { name, email, phone, address, city, country } = req.body;
+
+      const schema_name = `tenant_${name.toLowerCase().replace(/\s+/g, '_')}`;
+
+      const publicModelService = new PublicModelService(sequelize);
+      const models = publicModelService.getModels();
+
+      const { Tenant } = models;
       
-      await sequelize.query('SELECT public.create_tenant_schema(:tenantId);', {
-        replacements: { tenantId: tenant.id },
+      console.log('tenant:', typeof Tenant);
+
+      const tenant = await Tenant.create({
+        name,
+        email,
+        phone,
+        address,
+        city,
+        country,
+        schema_name,
       });
 
-      res.status(201).json({ message: 'Tenant created successfully', tenant });
-    } catch (error) {
-      console.error('Error creating schema:', error);
-      return res.status(500).json({ message: 'Internal server error while creating schema' });
-    }
-  } catch (error) {
-    console.error('Error creating tenant:', error);
-    return res.status(500).json({ message: 'Internal server error while creating tenant' });
-  }
-};
+      try {
+        await sequelize.query('SELECT public.create_tenant_schema(:tenantId);', {
+          replacements: { tenantId: tenant.id },
+        });
 
-export { createTenant };
+        res.status(201).json({ message: 'Tenant created successfully', tenant });
+      } catch (error) {
+        console.error('Error creating schema:', error);
+        return res.status(500).json({ message: 'Internal server error while creating schema' });
+      }
+    } catch (error) {
+      console.error('Error creating tenant:', error);
+      return res.status(500).json({ message: 'Internal server error while creating tenant' });
+    }
+  }
+
+}
+
+export const tenantController = new TenantController();

@@ -3,7 +3,12 @@ import cors from "cors";
 const app = express();
 import {connectDB,sequelize} from "./config/database.js"
 import tenantRoutes from "./routes/tenantRoutes.js";
-
+import carRoutes from "./routes/carRoutes.js"; 
+import cartypesRoutes from "./routes/cartypesRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import userRoutes from "./routes/UserRoutes.js";
+import userAdminRoutes from "./routes/adminUserRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
   connectDB();
   app.use(cors());
@@ -11,6 +16,12 @@ import tenantRoutes from "./routes/tenantRoutes.js";
   app.use(express.json());
 
 app.use('/api/tenants',tenantRoutes)
+app.use('/api/car',carRoutes)
+app.use('/api/cartypes',cartypesRoutes)
+app.use('/api/booking',bookingRoutes)
+app.use('/api/user', userRoutes);
+app.use('/api/useradmin', userAdminRoutes);
+app.use('/api/auth', authRoutes);
 
 app.listen(3000, ()=> {
     console.log("Server running on port 3000");
