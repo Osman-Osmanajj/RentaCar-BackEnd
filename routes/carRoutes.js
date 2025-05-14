@@ -1,12 +1,12 @@
-import { carController } from '../controllers/carController.js';
-
 import express from 'express';
+import { carController } from '../controllers/carController.js';
 
 const router = express.Router();
 
-router.post('/:id/cars', carController.createCar.bind(carController));
-router.delete('/cars', carController.deleteCars.bind(carController));
-router.get('/:id/cars', carController.getCars.bind(carController));
+router.post('/create', carController.createCar.bind(carController));
 
+router.delete('/:carId', carController.deleteCar.bind(carController));
+
+router.get('/all', carController.getCars.bind(carController));
 
 export default router;

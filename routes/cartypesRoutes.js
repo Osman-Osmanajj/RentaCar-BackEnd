@@ -1,8 +1,7 @@
-import {carTypeController} from '../controllers/CartypesController.js';
-
 import express from 'express';
-const router = express.Router();
+import { carTypeController } from '../controllers/CartypesController.js';
 
-router.post('/create/:id', carTypeController.createCarType.bind(carTypeController));
+const router = express.Router();
+router.post('/create', carTypeController.createCarType.bind(carTypeController));
 
 export default router;

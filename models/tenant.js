@@ -1,7 +1,7 @@
 'use strict';
 import { Model, DataTypes } from 'sequelize';
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
   class Tenant extends Model {
     static associate(models) {
       Tenant.hasMany(models.UsersAdmin, {
@@ -54,6 +54,8 @@ export default (sequelize) => {
       modelName: 'Tenant',
       tableName: 'tenants',
       underscored: true,
+      schema:      options.schema,
+      searchPath:  options.searchPath
     }
   );
 

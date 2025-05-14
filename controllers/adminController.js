@@ -1,37 +1,34 @@
-import { sequelize } from '../config/database.js';
-import { PublicModelService } from '../services/PublicModelService.js';
-
-class UserAdminController {
-  async createUserAdmin(req, res) {
+export class UserAdminController {
+  
+  async createUserAdmin(req, res, next) {
     try {
       const { id, tenantid } = req.body;
-    const publicModelService = new PublicModelService(sequelize);
-    const models = publicModelService.getModels();
+      const { User, UsersAdmin, Tenant } = req.app.get('models');
 
-    const { UsersAdmin,User } = models;
-    console.log('user:', User);
-    
+      //validations
+      const tenant = await Tenant.findByPk(tenantid);
+      if (!tenant) return res.status(404).json({ error: 'Tenant not found' });
 
-    console.log('UserAdmin Model:', UsersAdmin);
+      const user = await User.findByPk(id);
+      if (!user) return res.status(404).json({ error: 'User not found' });
 
-
-      const userAdmin = await UsersAdmin.create({
-        id,
-        tenantid,
+      //create / upsert admin record
+      const [userAdmin, created] = await UsersAdmin.findOrCreate({
+        where:   { id, tenantid },
+        defaults:{ id, tenantid }
       });
 
-      res.status(201).json({
-        message: 'User admin created successfully',
+      return res.status(created ? 201 : 200).json({
+        message: created
+          ? 'User promoted to admin successfully'
+          : 'User is already an admin for this tenant',
         userAdmin,
       });
-    } catch (error) {
-      console.error('Error creating user admin:', error);
-      res.status(500).json({
-        message: 'Internal server error while creating user admin',
-      });
+    } catch (err) {
+      console.error('Error creating user admin:', err);
+      next(err);                           
     }
   }
-
 }
 
 export const userAdminController = new UserAdminController();

@@ -1,7 +1,7 @@
 'use strict';
 import { Model, DataTypes } from 'sequelize';
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
   class UsersAdmin extends Model {
     static associate(models) {
       UsersAdmin.belongsTo(models.User, { foreignKey: 'id' });
@@ -36,6 +36,8 @@ export default (sequelize) => {
       modelName: 'UsersAdmin',
       tableName: 'users_admin',
       timestamps: false,
+      schema:      options.schema,
+      searchPath:  options.searchPath
     }
   );
 

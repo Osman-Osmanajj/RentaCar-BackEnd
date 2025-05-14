@@ -2,7 +2,7 @@
 import { Model, DataTypes } from 'sequelize';
 
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
 
   class Car extends Model {
     static associate(models) {
@@ -46,7 +46,9 @@ export default (sequelize) => {
       modelName: 'Car',
       tableName: 'cars',
       underscored: true,
-      timestamps: false
+      timestamps: false,
+      schema:      options.schema,
+      searchPath:  options.searchPath
     }
     
   );

@@ -1,7 +1,7 @@
 'use strict';
 import { Model, DataTypes } from 'sequelize';
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
   class Location extends Model {
     static associate(models) {
       Location.hasMany(models.LocationInventory, { foreignKey: 'location_id' });
@@ -30,6 +30,8 @@ export default (sequelize) => {
       tableName: 'locations',
       underscored: true,
       timestamps: false,
+      schema:      options.schema,
+      searchPath:  options.searchPath
     }
   );
 

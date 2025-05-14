@@ -1,7 +1,7 @@
 'use strict';
 import { Model, DataTypes } from 'sequelize';
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
   class CarDamageReport extends Model {
     static associate(models) {
       CarDamageReport.belongsTo(models.Car, { foreignKey: 'car_id' });
@@ -32,6 +32,8 @@ export default (sequelize) => {
       modelName: 'CarDamageReport',
       tableName: 'car_damage_reports',
       underscored: true,
+      schema:      options.schema,
+      searchPath:  options.searchPath
     }
   );
 
