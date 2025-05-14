@@ -32,6 +32,7 @@ export default (sequelize) => {
       modelName: 'CarDamageReport',
       tableName: 'car_damage_reports',
       underscored: true,
+      timestamps: false,
     }
   );
 
