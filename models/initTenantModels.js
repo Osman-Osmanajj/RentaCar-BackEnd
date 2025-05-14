@@ -1,4 +1,3 @@
-// initTenantModels.js
 import CarModel from './Car.js';
 import BookingModel from './Booking.js';
 import CarDamageReportModel from './CarDamageReport.js';

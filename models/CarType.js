@@ -1,7 +1,7 @@
 'use strict';
 import { Model, DataTypes } from 'sequelize';
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
   class CarType extends Model {
     static associate(models) {
       CarType.hasMany(models.Car, { foreignKey: 'car_type_id' });
@@ -24,6 +24,8 @@ export default (sequelize) => {
       tableName: 'car_types',
       underscored: true,
       timestamps: false,
+      schema:      options.schema,
+      searchPath:  options.searchPath
     }
   );
 

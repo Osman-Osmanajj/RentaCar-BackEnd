@@ -1,20 +1,28 @@
 import { sequelize } from '../config/database.js';
-import { PublicModelService } from '../services/PublicModelService.js';
+
+class HttpError extends Error {
+  constructor(statusCode, message) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
 
 class TenantController {
-  async createTenant(req, res) {
+  async createTenant(req, res, next) {
     try {
       const { name, email, phone, address, city, country } = req.body;
-
       const schema_name = `tenant_${name.toLowerCase().replace(/\s+/g, '_')}`;
+      const { Tenant } = req.app.get('models');
 
-      const publicModelService = new PublicModelService(sequelize);
-      const models = publicModelService.getModels();
+      // duplicate-email guard
+      const existing = await Tenant.findOne({ where: { email } });
+      if (existing) {
+        return next(
+          new HttpError(409, 'A tenant with that e-mail already exists')
+        );
+      }
 
-      const { Tenant } = models;
-      
-      console.log('tenant:', typeof Tenant);
-
+      // create tenant row
       const tenant = await Tenant.create({
         name,
         email,
@@ -25,77 +33,57 @@ class TenantController {
         schema_name,
       });
 
-      try {
-        await sequelize.query('SELECT public.create_tenant_schema(:tenantId);', {
-          replacements: { tenantId: tenant.id },
-        });
+      await sequelize.query(
+        'SELECT public.create_tenant_schema(:tenantId);',
+        { replacements: { tenantId: tenant.id } }
+      );
 
-        res.status(201).json({ message: 'Tenant created successfully', tenant });
-      } catch (error) {
-        console.error('Error creating schema:', error);
-        return res.status(500).json({ message: 'Internal server error while creating schema' });
-      }
-    } catch (error) {
-      console.error('Error creating tenant:', error);
-      return res.status(500).json({ message: 'Internal server error while creating tenant' });
+      return res
+        .status(201)
+        .json({ message: 'Tenant created successfully', tenant });
+    } catch (err) {
+      next(err);
     }
   }
-async getTenants(req, res) {
-    try {
-      const publicModelService = new PublicModelService(sequelize);
-      const models = publicModelService.getModels();
-      const { Tenant } = models;
 
+  async getTenants(_req, res, next) {
+    try {
+      const { Tenant } = req.app.get('models');
       const tenants = await Tenant.findAll();
-
-      res.status(200).json({ tenants });
-    } catch (error) {
-      console.error('Error fetching tenants:', error);
-      res.status(500).json({ message: 'Internal server error while fetching tenants' });
+      return res.status(200).json({ tenants });
+    } catch (err) {
+      next(err);
     }
   }
-async deleteTenants(req, res){
 
+  async getTenantById(req, res, next) {
     try {
       const { id } = req.params;
-      const publicModelService = new PublicModelService(sequelize);
-      const models = publicModelService.getModels();
-      const { Tenant } = models;
+      const { Tenant } = req.app.get('models');
 
-      const tenant = await Tenant.destroy({
-        where: { id },
-      });
-
+      const tenant = await Tenant.findByPk(id);
       if (!tenant) {
-        return res.status(404).json({ message: 'Tenant not found' });
+        return next(new HttpError(404, 'Tenant not found'));
       }
-
-      res.status(200).json({ message: 'Tenant deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting tenant:', error);
-      res.status(500).json({ message: 'Internal server error while deleting tenant' });
+      return res.status(200).json({ tenant });
+    } catch (err) {
+      next(err);
     }
-}  
+  }
 
-async getTenantsbyId(req, res) {
+  async deleteTenant(req, res, next) {
     try {
       const { id } = req.params;
-      const publicModelService = new PublicModelService(sequelize);
-      const models = publicModelService.getModels();
-      const { Tenant } = models;
+      const { Tenant } = req.app.get('models');
 
-      const tenant = await Tenant.findOne({
-        where: { id },
-      });
-
-      if (!tenant) {
-        return res.status(404).json({ message: 'Tenant not found' });
+      const deleted = await Tenant.destroy({ where: { id } });
+      if (!deleted) {
+        return next(new HttpError(404, 'Tenant not found'));
       }
 
-      res.status(200).json({ tenant });
-    } catch (error) {
-      console.error('Error fetching tenant:', error);
-      res.status(500).json({ message: 'Internal server error while fetching tenant' });
+      return res.status(200).json({ message: 'Tenant deleted successfully' });
+    } catch (err) {
+      next(err);
     }
   }
 }

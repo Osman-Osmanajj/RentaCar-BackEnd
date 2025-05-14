@@ -1,22 +1,26 @@
-import { sequelize } from '../config/database.js';
-import { TenantModelService } from '../services/TenantModelService.js';
-import { PublicModelService } from '../services/PublicModelService.js';
-
+// controllers/carController.js
 class CarController {
-  async createCar(req, res) {
+  /* ───────── POST /api/car/create ───────── */
+  async createCar(req, res, next) {
     try {
-      const { id } = req.params;
-      const { make, model, year, license_plate, status, car_type_id } = req.body;
+      const {
+        make,
+        model,
+        year,
+        license_plate,
+        status = 'Available',
+        car_type_id,
+      } = req.body;
 
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { Car } = models;
+      const { Car } = req.tenantModels;
 
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
+      // duplicate license-plate guard (optional)
+      const dup = await Car.findOne({ where: { license_plate } });
+      if (dup) {
+        return res
+          .status(409)
+          .json({ message: 'A car with that license plate already exists' });
+      }
 
       const car = await Car.create({
         make,
@@ -27,129 +31,83 @@ class CarController {
         car_type_id,
       });
 
-      res.status(201).json({ message: 'Car created successfully', car });
-    } catch (error) {
-      console.error('Error creating car:', error);
-      res.status(500).json({ message: 'Internal server error while creating car' });
+      return res
+        .status(201)
+        .json({ message: 'Car created successfully', car });
+    } catch (err) {
+      next(err);
     }
   }
 
-  async deleteCars(req, res) {
+  /* ───────── DELETE /api/car/:id ───────── */
+  async deleteCar(req, res, next) {
     try {
-      const { id, carId } = req.body;
+      const { id } = req.params;          // id = carId
+      const { Car } = req.tenantModels;
 
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { Car } = models;
-
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-
-      const car = await Car.findByPk(carId);
-
+      const car = await Car.findByPk(id);
       if (!car) {
         return res.status(404).json({ message: 'Car not found' });
       }
 
       await car.destroy();
-
-      res.status(200).json({ message: 'Car deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting car:', error);
-      res.status(500).json({ message: 'Internal server error while deleting car' });
+      return res.status(200).json({ message: 'Car deleted successfully' });
+    } catch (err) {
+      next(err);
     }
   }
 
-  async getCars(req, res) {
+  /* ───────── GET /api/car/all ───────── */
+  async getCars(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { Car } = models;
-
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-
+      const { Car } = req.tenantModels;
       const cars = await Car.findAll();
 
-      if (!cars || cars.length === 0) {
+      if (!cars.length) {
         return res.status(404).json({ message: 'No cars found' });
       }
-
-      res.status(200).json(cars);
-    } catch (error) {
-      console.error('Error fetching cars:', error);
-      res.status(500).json({ message: 'Internal server error while fetching cars' });
+      return res.status(200).json(cars);
+    } catch (err) {
+      next(err);
     }
   }
 
-  async getCarById(req, res) {
+  /* ───────── GET /api/car/:id ───────── */
+  async getCarById(req, res, next) {
     try {
-      const { id, carId } = req.params;
-      
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { Car } = models;
-  
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-      console.log('Car ID:', carId);
-  
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-  
-      const car = await Car.findByPk(carId);
-  
+      const { id } = req.params;          // id = carId
+      const { Car } = req.tenantModels;
+
+      const car = await Car.findByPk(id);
       if (!car) {
         return res.status(404).json({ message: 'Car not found' });
       }
-  
-      res.status(200).json(car);
-    } catch (error) {
-      console.error('Error fetching car by ID:', error);
-      res.status(500).json({ message: 'Internal server error while fetching car' });
+      return res.status(200).json(car);
+    } catch (err) {
+      next(err);
     }
   }
-  
-  async updateCarById(req, res) {
+
+  /* ───────── PATCH /api/car/:id ───────── */
+  async updateCarById(req, res, next) {
     try {
-      const { id, carId } = req.params; 
+      const { id } = req.params;          // id = carId
       const updateData = req.body;
-      
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { Car } = models;
-  
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-      console.log('Car ID:', carId);
-      console.log('Update Data:', updateData);
-  
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-  
-      const car = await Car.findByPk(carId);
-  
+      const { Car } = req.tenantModels;
+
+      const car = await Car.findByPk(id);
       if (!car) {
         return res.status(404).json({ message: 'Car not found' });
       }
-  
+
       await car.update(updateData);
-  
-      res.status(200).json({ message: 'Car updated successfully', car });
-    } catch (error) {
-      console.error('Error updating car:', error);
-      res.status(500).json({ message: 'Internal server error while updating car' });
+      return res
+        .status(200)
+        .json({ message: 'Car updated successfully', car });
+    } catch (err) {
+      next(err);
     }
   }
-  
 }
 
 export const carController = new CarController();

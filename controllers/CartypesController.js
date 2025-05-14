@@ -1,154 +1,86 @@
-import { sequelize } from '../config/database.js';
-import { TenantModelService } from '../services/TenantModelService.js';
-import { PublicModelService } from '../services/PublicModelService.js';
-
-
 class CarTypeController {
-  async createCarType(req, res) {
-    const { name, description } = req.body;
-
+  async createCarType(req, res, next) {
     try {
-      const { id } = req.params;
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarType } = models;
-
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
+      const { name, description } = req.body;
+      const { CarType } = req.tenantModels;
 
       const carType = await CarType.create({ name, description });
 
-      res.status(201).json({
+      return res.status(201).json({
         message: 'Car type created successfully',
         carType,
       });
-    } catch (error) {
-      console.error('Error creating car type:', error);
-      res.status(500).json({
-        message: 'Internal server error while creating car type',
-      });
+    } catch (err) {
+      next(err);
     }
   }
 
-  async deleteCarTypeById(req, res) {
+  async deleteCarTypeById(req, res, next) {
     try {
-      const { id, carTypeId } = req.params;
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarType } = models;
-  
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-      console.log('Car Type ID:', carTypeId);
-  
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-  
-      const carType = await CarType.findByPk(carTypeId);
-  
+      const { id } = req.params;           
+      const { CarType } = req.tenantModels;
+
+      const carType = await CarType.findByPk(id);
       if (!carType) {
         return res.status(404).json({ message: 'Car type not found' });
       }
-  
+
       await carType.destroy();
-  
       res.status(200).json({ message: 'Car type deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting car type:', error);
-      res.status(500).json({ message: 'Internal server error while deleting car type' });
+    } catch (err) {
+      next(err);
     }
   }
-  
-  async getCarTypes(req, res) {
+
+  async getCarTypes(req, res, next) {
     try {
-      const { id } = req.params;
-  
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarType } = models;
-  
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-  
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-  
+      const { CarType } = req.tenantModels;
       const carTypes = await CarType.findAll();
-  
-      if (!carTypes || carTypes.length === 0) {
+
+      if (!carTypes.length) {
         return res.status(404).json({ message: 'No car types found' });
       }
-  
       res.status(200).json(carTypes);
-    } catch (error) {
-      console.error('Error fetching car types:', error);
-      res.status(500).json({ message: 'Internal server error while fetching car types' });
+    } catch (err) {
+      next(err);
     }
   }
-  
-  async getCarTypeById(req, res) {
+
+  async getCarTypeById(req, res, next) {
     try {
-      const { id, carTypeId } = req.params;
-  
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarType } = models;
-  
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-      console.log('Car Type ID:', carTypeId);
-  
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-  
-      const carType = await CarType.findByPk(carTypeId);
-  
+      const { id } = req.params;            
+      const { CarType } = req.tenantModels;
+
+      const carType = await CarType.findByPk(id);
       if (!carType) {
         return res.status(404).json({ message: 'Car type not found' });
       }
-  
       res.status(200).json(carType);
-    } catch (error) {
-      console.error('Error fetching car type by ID:', error);
-      res.status(500).json({ message: 'Internal server error while fetching car type' });
+    } catch (err) {
+      next(err);
     }
   }
-  
-  async updateCarTypeById(req, res) {
+
+  async updateCarTypeById(req, res, next) {
     try {
-      const { id, carTypeId } = req.params;
+      const { id } = req.params;            
       const updateData = req.body;
-  
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarType } = models;
-  
-      console.log('Tenant ID:', id);
-      console.log('Schema Name:', schemaName);
-      console.log('CarType ID:', carTypeId);
-      console.log('Update Data:', updateData);
-  
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-  
-      const carType = await CarType.findByPk(carTypeId);
-  
+      const { CarType } = req.tenantModels;
+
+      const carType = await CarType.findByPk(id);
       if (!carType) {
         return res.status(404).json({ message: 'Car type not found' });
       }
-  
+
       await carType.update(updateData);
-  
-      res.status(200).json({ message: 'Car type updated successfully', carType });
-    } catch (error) {
-      console.error('Error updating car type:', error);
-      res.status(500).json({ message: 'Internal server error while updating car type' });
+      res.status(200).json({
+        message: 'Car type updated successfully',
+        carType,
+      });
+    } catch (err) {
+      next(err);
     }
   }
-  
 }
 
 export const carTypeController = new CarTypeController();

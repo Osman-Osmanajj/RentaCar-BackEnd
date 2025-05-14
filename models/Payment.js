@@ -1,7 +1,7 @@
 'use strict';
 import { Model, DataTypes } from 'sequelize';
 
-export default (sequelize) => {
+export default (sequelize, options = {}) => {
   class Payment extends Model {
     static associate(models) {
       Payment.belongsTo(models.Booking, { foreignKey: 'booking_id' });
@@ -32,7 +32,9 @@ export default (sequelize) => {
       modelName: 'Payment',
       tableName: 'payments',
       underscored: true,
-      timestamps: false,
+      schema:      options.schema,
+      searchPath:  options.searchPath
+
     }
   );
 
