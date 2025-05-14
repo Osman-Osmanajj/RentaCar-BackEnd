@@ -24,6 +24,7 @@ export default (sequelize) => {
       modelName: 'CarImage',
       tableName: 'car_images',
       underscored: true,
+      timestamps: false,
     }
   );
 

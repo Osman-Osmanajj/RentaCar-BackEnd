@@ -38,7 +38,9 @@ class CarController {
     try {
       const { id, carId } = req.body;
 
-      const { models, schemaName } = await getTenantModels(id);
+      const publicModelService = new PublicModelService(sequelize);
+      const tenantModelService = new TenantModelService(publicModelService);
+      const { models, schemaName } = await tenantModelService.getTenantModels(id);
       const { Car } = models;
 
       console.log('Tenant ID:', id);
@@ -65,7 +67,9 @@ class CarController {
     try {
       const { id } = req.params;
 
-      const { models, schemaName } = await getTenantModels(id);
+      const publicModelService = new PublicModelService(sequelize);
+      const tenantModelService = new TenantModelService(publicModelService);
+      const { models, schemaName } = await tenantModelService.getTenantModels(id);
       const { Car } = models;
 
       console.log('Tenant ID:', id);
@@ -85,6 +89,67 @@ class CarController {
       res.status(500).json({ message: 'Internal server error while fetching cars' });
     }
   }
+
+  async getCarById(req, res) {
+    try {
+      const { id, carId } = req.params;
+      
+      const publicModelService = new PublicModelService(sequelize);
+      const tenantModelService = new TenantModelService(publicModelService);
+      const { models, schemaName } = await tenantModelService.getTenantModels(id);
+      const { Car } = models;
+  
+      console.log('Tenant ID:', id);
+      console.log('Schema Name:', schemaName);
+      console.log('Car ID:', carId);
+  
+      await sequelize.query(`SET search_path TO ${schemaName};`);
+  
+      const car = await Car.findByPk(carId);
+  
+      if (!car) {
+        return res.status(404).json({ message: 'Car not found' });
+      }
+  
+      res.status(200).json(car);
+    } catch (error) {
+      console.error('Error fetching car by ID:', error);
+      res.status(500).json({ message: 'Internal server error while fetching car' });
+    }
+  }
+  
+  async updateCarById(req, res) {
+    try {
+      const { id, carId } = req.params; 
+      const updateData = req.body;
+      
+      const publicModelService = new PublicModelService(sequelize);
+      const tenantModelService = new TenantModelService(publicModelService);
+      const { models, schemaName } = await tenantModelService.getTenantModels(id);
+      const { Car } = models;
+  
+      console.log('Tenant ID:', id);
+      console.log('Schema Name:', schemaName);
+      console.log('Car ID:', carId);
+      console.log('Update Data:', updateData);
+  
+      await sequelize.query(`SET search_path TO ${schemaName};`);
+  
+      const car = await Car.findByPk(carId);
+  
+      if (!car) {
+        return res.status(404).json({ message: 'Car not found' });
+      }
+  
+      await car.update(updateData);
+  
+      res.status(200).json({ message: 'Car updated successfully', car });
+    } catch (error) {
+      console.error('Error updating car:', error);
+      res.status(500).json({ message: 'Internal server error while updating car' });
+    }
+  }
+  
 }
 
 export const carController = new CarController();

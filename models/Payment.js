@@ -32,6 +32,7 @@ export default (sequelize) => {
       modelName: 'Payment',
       tableName: 'payments',
       underscored: true,
+      timestamps: false,
     }
   );
 

@@ -11,7 +11,12 @@
   import authRoutes from "./routes/authRoutes.js";
   import maintenanceRoutes from './routes/maintenancerecordRoutes.js';
   import cardamageRoutes from './routes/cardamageRoutes.js';
-  
+  import locationRoutes from "./routes/locationRoutes.js";
+  import locationInventoryRoutes from "./routes/locationInventoryRoutes.js";
+  import reviewRoutes from "./routes/reviewRoutes.js";
+  import carimageRoutes from "./routes/carImageRoutes.js";
+  import paymentRoutes from "./routes/paymentRoutes.js";
+
 
 
     connectDB();
@@ -28,6 +33,11 @@
   app.use('/api/auth', authRoutes);
   app.use('/api/maintenance', maintenanceRoutes);
   app.use('/api/cardamage', cardamageRoutes);
+  app.use('/api/location', locationRoutes);
+  app.use('/api/locationInventory', locationInventoryRoutes);
+  app.use('/api/review', reviewRoutes);
+  app.use('/api/carimage', carimageRoutes);
+  app.use('/api/payment', paymentRoutes);
 
   app.listen(3000, ()=> {
       console.log("Server running on port 3000");

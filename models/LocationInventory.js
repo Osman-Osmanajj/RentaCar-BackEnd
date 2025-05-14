@@ -14,10 +14,12 @@ export default (sequelize) => {
       location_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
       },
       car_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
       },
       quantity_available: {
         type: DataTypes.INTEGER,
@@ -29,6 +31,7 @@ export default (sequelize) => {
       modelName: 'LocationInventory',
       tableName: 'location_inventory',
       underscored: true,
+      timestamps: false,
     }
   );
 
