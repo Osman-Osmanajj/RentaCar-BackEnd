@@ -28,6 +28,64 @@ class UserController {
     }
   }
 
+  async deleteUser(req, res) {
+    try {
+      const { id } = req.params;
+      const publicModelService = new PublicModelService(sequelize);
+      const models = publicModelService.getModels();
+      const { User } = models;
+
+      const user = await User.destroy({
+        where: { id },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Something went wrong' });
+    }
+  }
+
+  async getUsers(req,res){
+    try {
+      const publicModelService = new PublicModelService(sequelize);
+      const models = publicModelService.getModels();
+      const { User } = models;
+
+      const users = await User.findAll();
+
+      res.status(200).json({ users });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Something went wrong' });
+    }
+  }
+  async getUsersById(req,res){
+    try {
+      const { id } = req.params;
+      const publicModelService = new PublicModelService(sequelize);
+      const models = publicModelService.getModels();
+      const { User } = models;
+
+      const user = await User.findOne({
+        where: { id },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      res.status(500).json({ error: 'Something went wrong' });
+    }
+  }
+
 }
 
 export const userController = new UserController();
