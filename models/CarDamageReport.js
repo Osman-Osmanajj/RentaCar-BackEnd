@@ -29,11 +29,14 @@ export default (sequelize, options = {}) => {
     },
     {
       sequelize,
-      modelName: 'CarDamageReport',
-      tableName: 'car_damage_reports',
+      modelName:  'CarDamageReport',
+      tableName:  'car_damage_reports',
       underscored: true,
-      schema:      options.schema,
-      searchPath:  options.searchPath
+
+      schema:     options.schema,
+      searchPath: options.searchPath,
+
+      timestamps: false,
     }
   );
 

@@ -14,10 +14,12 @@ export default (sequelize, options = {}) => {
       location_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
       },
       car_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        primaryKey: true,
       },
       quantity_available: {
         type: DataTypes.INTEGER,

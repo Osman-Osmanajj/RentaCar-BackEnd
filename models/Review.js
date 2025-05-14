@@ -41,6 +41,7 @@ export default (sequelize, options = {}) => {
       underscored: true,
       schema:      options.schema,
       searchPath:  options.searchPath
+
     }
   );
 
