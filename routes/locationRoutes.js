@@ -4,10 +4,10 @@ import express from 'express';
 const router = express.Router();
 
 
-router.post('/:id/locations', locationController.createLocation.bind(locationController));
-router.get('/:id/locations', locationController.getLocations.bind(locationController));
-router.get('/tenants/:id/locations/:locationId', locationController.getLocationById.bind(locationController));
-router.put('/tenants/:id/locations/:locationId', locationController.updateLocationById.bind(locationController));
-router.delete('/:id/locations/:locationId', locationController.deleteLocation.bind(locationController));
+router.post('/create', locationController.createLocation.bind(locationController));
+router.get('/all', locationController.getLocations.bind(locationController));
+router.get('/:id', locationController.getLocationById.bind(locationController));
+router.patch('/:id', locationController.updateLocationById.bind(locationController));
+router.delete('/:id', locationController.deleteLocation.bind(locationController));
 
 export default router;
