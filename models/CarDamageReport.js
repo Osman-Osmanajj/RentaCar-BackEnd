@@ -32,7 +32,7 @@ export default (sequelize, options = {}) => {
       modelName:  'CarDamageReport',
       tableName:  'car_damage_reports',
       underscored: true,
-
+      timestamps: false,
       schema:     options.schema,
       searchPath: options.searchPath,
 

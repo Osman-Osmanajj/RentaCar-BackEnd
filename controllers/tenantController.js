@@ -48,7 +48,7 @@ class TenantController {
 
   async getTenants(_req, res, next) {
     try {
-      const { Tenant } = req.app.get('models');
+      const { Tenant } = _req.app.get('models');
       const tenants = await Tenant.findAll();
       return res.status(200).json({ tenants });
     } catch (err) {

@@ -24,6 +24,7 @@ export default (sequelize, options = {}) => {
       modelName: 'CarImage',
       tableName: 'car_images',
       underscored: true,
+      timestamps: false,
       schema:      options.schema,
       searchPath:  options.searchPath
     }

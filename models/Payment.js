@@ -32,6 +32,7 @@ export default (sequelize, options = {}) => {
       modelName: 'Payment',
       tableName: 'payments',
       underscored: true,
+      timestamps: false,
       schema:      options.schema,
       searchPath:  options.searchPath
 

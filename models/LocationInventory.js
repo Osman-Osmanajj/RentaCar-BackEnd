@@ -31,6 +31,7 @@ export default (sequelize, options = {}) => {
       modelName: 'LocationInventory',
       tableName: 'location_inventory',
       underscored: true,
+      timestamps: false,
       schema:      options.schema,
       searchPath:  options.searchPath
     }

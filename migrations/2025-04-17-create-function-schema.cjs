@@ -21,6 +21,15 @@ module.exports = {
         /* --------------------- core tables ------------------ */
 
         EXECUTE format($fmt$
+          CREATE TABLE IF NOT EXISTS %I.car_types (
+            id SERIAL PRIMARY KEY,
+            name        VARCHAR(50) NOT NULL,
+            description TEXT
+          )
+        $fmt$, schema_name);
+        
+
+        EXECUTE format($fmt$
           CREATE TABLE IF NOT EXISTS %I.cars (
             id SERIAL PRIMARY KEY,
             make            VARCHAR(100) NOT NULL,
@@ -30,17 +39,9 @@ module.exports = {
             license_plate   VARCHAR(50) UNIQUE NOT NULL,
             status          VARCHAR(50) CHECK (status IN
                              ('Available','Rented','Maintenance')) NOT NULL,
-            car_type_id     INT
+            car_type_id INT REFERENCES %I.car_types(id)
           )
-        $fmt$, schema_name);
-
-        EXECUTE format($fmt$
-          CREATE TABLE IF NOT EXISTS %I.car_types (
-            id SERIAL PRIMARY KEY,
-            name        VARCHAR(50) NOT NULL,
-            description TEXT
-          )
-        $fmt$, schema_name);
+        $fmt$, schema_name, schema_name);
 
         EXECUTE format($fmt$
           CREATE TABLE IF NOT EXISTS %I.car_images (
@@ -97,7 +98,7 @@ module.exports = {
         EXECUTE format($fmt$
           CREATE TABLE IF NOT EXISTS %I.reviews (
             id SERIAL PRIMARY KEY,
-            user_id  INT NOT NULL,
+            user_id  INT NOT NULL REFERENCES public.users(id),
             car_id   INT REFERENCES %I.cars(id) ON DELETE CASCADE,
             rating   INT CHECK (rating BETWEEN 1 AND 5) NOT NULL,
             comment  TEXT,

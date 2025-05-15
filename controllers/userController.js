@@ -70,7 +70,7 @@ class UserController {
 
   async getUsers(_req, res, next) {
     try {
-      const { User } = req.app.get('models');
+      const { User } = _req.app.get('models');
       const users = await User.findAll();
       return res.status(200).json({ users });
     } catch (err) {

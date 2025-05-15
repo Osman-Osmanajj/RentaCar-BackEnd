@@ -38,6 +38,7 @@ export default (sequelize, options = {}) => {
       sequelize,
       modelName: 'Review',
       tableName: 'reviews',
+      timestamps: false,
       underscored: true,
       schema:      options.schema,
       searchPath:  options.searchPath

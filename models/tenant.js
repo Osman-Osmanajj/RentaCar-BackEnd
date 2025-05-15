@@ -54,6 +54,7 @@ export default (sequelize, options = {}) => {
       modelName: 'Tenant',
       tableName: 'tenants',
       underscored: true,
+      timestamps: false,
       schema:      options.schema,
       searchPath:  options.searchPath
     }

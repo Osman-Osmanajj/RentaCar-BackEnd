@@ -1,4 +1,4 @@
-
+import { initTenantModels } from "../models/initTenantModels.js";
 async function tenantMiddleware(req, res, next) {
   const tenantId = req.header('X-Tenant-ID');
   if (!tenantId) {
