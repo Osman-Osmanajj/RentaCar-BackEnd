@@ -34,9 +34,7 @@ export default (sequelize, options = {}) => {
       underscored: true,
       timestamps: false,
       schema:     options.schema,
-      searchPath: options.searchPath,
-
-      timestamps: false,
+      searchPath: options.searchPath
     }
   );
 
