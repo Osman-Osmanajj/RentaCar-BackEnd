@@ -3,7 +3,7 @@ import { locationInventoryController } from '../controllers/LocationInventoryCon
 
 const router = express.Router();
 
-router.post('/:id/inventory', locationInventoryController.createInventory.bind(locationInventoryController));
-router.get('/:id/inventory', locationInventoryController.getInventories.bind(locationInventoryController));
+router.post('/create', locationInventoryController.createInventory.bind(locationInventoryController));
+router.get('/all', locationInventoryController.getInventories.bind(locationInventoryController));
 
 export default router;

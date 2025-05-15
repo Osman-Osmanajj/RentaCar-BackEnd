@@ -1,19 +1,9 @@
-import { sequelize } from '../config/database.js';
-import { TenantModelService } from '../services/TenantModelService.js';
-import { PublicModelService } from '../services/PublicModelService.js';
-
 class CarDamageReportController {
-  async createDamageReport(req, res) {
+  // create a damage report
+  async createDamageReport(req, res, next) {
     try {
-      const { id } = req.params;
       const { car_id, damage_type, description, cost, status } = req.body;
-
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarDamageReport } = models;
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
+      const { CarDamageReport } = req.tenantModels;
 
       const report = await CarDamageReport.create({
         car_id,
@@ -25,21 +15,14 @@ class CarDamageReportController {
 
       res.status(201).json({ message: 'Damage report created successfully', report });
     } catch (error) {
-      console.error('Error creating damage report:', error);
-      res.status(500).json({ message: 'Internal server error while creating damage report' });
+      next(error);
     }
   }
 
-  async getDamageReports(req, res) {
+// get all damage reports
+  async getDamageReports(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarDamageReport } = models;
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
+      const { CarDamageReport } = req.tenantModels;
 
       const reports = await CarDamageReport.findAll();
 
@@ -49,23 +32,17 @@ class CarDamageReportController {
 
       res.status(200).json(reports);
     } catch (error) {
-      console.error('Error fetching damage reports:', error);
-      res.status(500).json({ message: 'Internal server error while fetching damage reports' });
+      next(error);
     }
   }
 
-  async getDamageReportById(req, res) {
+  // get demage reprt by id
+  async getDamageReportById(req, res, next) {
     try {
-      const { id, reportId } = req.params;
+      const { id } = req.params; // id = reportId
+      const { CarDamageReport } = req.tenantModels;
 
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarDamageReport } = models;
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-
-      const report = await CarDamageReport.findByPk(reportId);
+      const report = await CarDamageReport.findByPk(id);
 
       if (!report) {
         return res.status(404).json({ message: 'Damage report not found' });
@@ -73,24 +50,18 @@ class CarDamageReportController {
 
       res.status(200).json(report);
     } catch (error) {
-      console.error('Error fetching damage report by ID:', error);
-      res.status(500).json({ message: 'Internal server error while fetching damage report' });
+      next(error);
     }
   }
 
-  async updateDamageReport(req, res) {
+  // update damage report
+  async updateDamageReport(req, res, next) {
     try {
-      const { id, reportId } = req.params;
+      const { id } = req.params; // id = reportId
       const updateData = req.body;
+      const { CarDamageReport } = req.tenantModels;
 
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarDamageReport } = models;
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-
-      const report = await CarDamageReport.findByPk(reportId);
+      const report = await CarDamageReport.findByPk(id);
 
       if (!report) {
         return res.status(404).json({ message: 'Damage report not found' });
@@ -100,23 +71,17 @@ class CarDamageReportController {
 
       res.status(200).json({ message: 'Damage report updated successfully', report });
     } catch (error) {
-      console.error('Error updating damage report:', error);
-      res.status(500).json({ message: 'Internal server error while updating damage report' });
+      next(error);
     }
   }
 
-  async deleteDamageReport(req, res) {
+  // delete damage report
+  async deleteDamageReport(req, res, next) {
     try {
-      const { id, reportId } = req.params;
+      const { id } = req.params; // id = reportId
+      const { CarDamageReport } = req.tenantModels;
 
-      const publicModelService = new PublicModelService(sequelize);
-      const tenantModelService = new TenantModelService(publicModelService);
-      const { models, schemaName } = await tenantModelService.getTenantModels(id);
-      const { CarDamageReport } = models;
-
-      await sequelize.query(`SET search_path TO ${schemaName};`);
-
-      const report = await CarDamageReport.findByPk(reportId);
+      const report = await CarDamageReport.findByPk(id);
 
       if (!report) {
         return res.status(404).json({ message: 'Damage report not found' });
@@ -126,8 +91,7 @@ class CarDamageReportController {
 
       res.status(200).json({ message: 'Damage report deleted successfully' });
     } catch (error) {
-      console.error('Error deleting damage report:', error);
-      res.status(500).json({ message: 'Internal server error while deleting damage report' });
+      next(error);
     }
   }
 }

@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/tenants', tenantController.createTenant.bind(tenantController));
 router.get('/tenants', tenantController.getTenants.bind(tenantController));
-router.delete('/tenants/:id', tenantController.deleteTenants.bind(tenantController));
-router.get('/tenants/:id', tenantController.getTenantsbyId.bind(tenantController));
+router.delete('/tenants/:id', tenantController.deleteTenant.bind(tenantController));
+
 export default router;  
