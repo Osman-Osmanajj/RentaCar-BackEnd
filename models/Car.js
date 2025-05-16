@@ -40,6 +40,10 @@ export default (sequelize, options = {}) => {
       car_type_id: {
         type: DataTypes.INTEGER,
       },
+      price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
     },
     {
       sequelize,

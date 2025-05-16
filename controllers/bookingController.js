@@ -61,6 +61,37 @@ class BookingController {
       next(err);
     }
   }
+
+ async getAllBookings(req, res, next) {
+  try {
+    const { Booking,Car } = req.tenantModels;
+    const { User } = req.app.get('models'); 
+
+    
+    if (!Booking.associations.User) {
+      Booking.belongsTo(User, { foreignKey: 'user_id' });
+    }
+
+    const bookings = await Booking.findAll({
+      include: [
+        {
+          model: Car,
+          attributes: ['make']
+        },
+        {
+          model: User,
+          attributes: ['name']
+        }
+      ],
+
+    });
+
+    return res.status(200).json(bookings);
+  } catch (err) {
+    next(err);
+  }
+}
+
 }
 
 export const bookingController = new BookingController();

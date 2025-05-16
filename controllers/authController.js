@@ -32,18 +32,17 @@ class AuthController {
         { expiresIn: '7d' }
       );
 
-      // set them as HttpOnly, Secure, SameSite cookies
-      res
-        .cookie('access_token',  accessToken, {
+      
+     res.cookie('access_token', accessToken, {
           httpOnly: true,
-          secure:   process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge:   15 * 60 * 1000 // 15 minutes
+          secure: true,             
+          sameSite: 'None',           
+          maxAge: 15 * 60 * 1000
         })
         .cookie('refresh_token', refreshToken, {
           httpOnly: true,
           secure:   process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
+          sameSite: 'None',
           maxAge:   7 * 24 * 60 * 60 * 1000 // 7 days
         })
         .status(200)
