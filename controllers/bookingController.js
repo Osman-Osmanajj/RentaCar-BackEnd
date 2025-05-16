@@ -18,10 +18,9 @@ class BookingController {
         start_date,
         end_date,
         status = 'Pending',
-        total_price,
       } = req.body;
 
-      const { Booking } = req.tenantModels;   
+      const { Booking, Car } = req.tenantModels;   
 
       //overlap guard
       const overlapping = await Booking.findOne({
@@ -42,8 +41,26 @@ class BookingController {
           )
         );
       }
+      const car = await Car.findByPk(car_id);
+      const pricePerDay = car.price;
 
-      //create booking 
+      function calculatePrice(startDateStr, endDateStr) {
+        const start = new Date(startDateStr);
+        const end   = new Date(endDateStr);
+
+        const diffMs = end - start;
+        if (diffMs < 0) {
+          throw new Error("End date must be after start date");
+        }
+
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+        const fullDays = Math.ceil(diffDays);
+
+        return fullDays * pricePerDay;
+      }
+      const total_price = calculatePrice(start_date, end_date);
+
       const booking = await Booking.create({
         user_id: userId,
         car_id,

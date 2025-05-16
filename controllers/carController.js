@@ -11,9 +11,10 @@ class CarController {
         status = 'Available',
         car_type_id,
         price,
+        image_url,
       } = req.body;
 
-      const { Car } = req.tenantModels;
+      const { Car , CarImage} = req.tenantModels;
 
       // duplicate license-plate guard (optional)
       const dup = await Car.findOne({ where: { license_plate } });
@@ -31,6 +32,11 @@ class CarController {
         status,
         car_type_id,
         price,
+      });
+      
+      const carImage = await CarImage.create({
+        car_id: car.id,
+        image_url,
       });
 
       return res
@@ -78,9 +84,16 @@ class CarController {
   async getCarById(req, res, next) {
     try {
       const { id } = req.params;          // id = carId
-      const { Car } = req.tenantModels;
+      const { Car, CarImage } = req.tenantModels;
 
-      const car = await Car.findByPk(id);
+      const car = await Car.findByPk(id ,{
+      include: [
+        {
+          model: CarImage,
+          attributes: ['image_url'],
+        },
+      ],
+    });
       if (!car) {
         return res.status(404).json({ message: 'Car not found' });
       }
@@ -110,6 +123,33 @@ class CarController {
       next(err);
     }
   }
+   /* ───────── GET /api/car/img-type ───────── */
+  async getCarsTypesImages(req, res, next) {
+    try {
+      const { Car, CarImage, CarType } = req.tenantModels;
+
+      const cars = await Car.findAll({
+        include: [
+          {
+            model: CarImage,
+          },
+          {
+            model: CarType,
+            required: false 
+          }
+        ]
+      });
+
+      if (!cars.length) {
+        return res.status(404).json({ message: 'No cars found' });
+      }
+
+      return res.status(200).json(cars);
+    } catch (err) {
+      next(err);
+    }
+  }
+
 }
 
 export const carController = new CarController();
