@@ -39,7 +39,8 @@ module.exports = {
             license_plate   VARCHAR(50) UNIQUE NOT NULL,
             status          VARCHAR(50) CHECK (status IN
                              ('Available','Rented','Maintenance')) NOT NULL,
-            car_type_id INT REFERENCES %I.car_types(id)
+            car_type_id INT REFERENCES %I.car_types(id),
+            price           DECIMAL(10, 2) CHECK (price > 0)
           )
         $fmt$, schema_name, schema_name);
 
@@ -145,7 +146,7 @@ module.exports = {
 
 
     await queryInterface.sequelize.query(`
-      CREATE TRIGGER trg_after_tenant_insert
+      CREATE OR REPLACE TRIGGER trg_after_tenant_insert
       AFTER INSERT ON public.tenants
       FOR EACH ROW
       EXECUTE FUNCTION public.create_tenant_schema_trigger();

@@ -10,6 +10,7 @@ class CarController {
         license_plate,
         status = 'Available',
         car_type_id,
+        price,
       } = req.body;
 
       const { Car } = req.tenantModels;
@@ -29,6 +30,7 @@ class CarController {
         license_plate,
         status,
         car_type_id,
+        price,
       });
 
       return res
