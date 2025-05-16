@@ -23,6 +23,7 @@ import paymentRoutes            from './routes/paymentRoutes.js';
 import { errorHandler }         from './middlewares/errorHandler.js';
 import { tenantMiddleware }     from './middlewares/tenantMiddleware.js';
 import { authenticateJWT }      from './middlewares/authenticateJWT.js';
+import superAdminRoutes from './routes/superAdminRoutes.js';
 
 const app = express();
 
@@ -62,6 +63,9 @@ app.use('/api/payment',     authenticateJWT, tenantMiddleware, paymentRoutes);
 // ── Protected user/admin routes ─────────────────────────────────────
 app.use('/api/user',      authenticateJWT, userRoutes);
 app.use('/api/useradmin', authenticateJWT, userAdminRoutes);
+app.use('/api/super', superAdminRoutes);
+
+app.use('/api/super', authenticateJWT, superAdminRoutes);
 
 // global error handler
 app.use(errorHandler);

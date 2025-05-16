@@ -70,7 +70,24 @@ class TenantController {
       next(err);
     }
   }
+  // ─── UPDATE TENANT ─────────────────────────────────────────────────────────
+  async updateTenant(req, res, next) {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      const { Tenant } = req.app.get('models');
 
+      const tenant = await Tenant.findByPk(id);
+      if (!tenant) {
+        return res.status(404).json({ message: 'Tenant not found' });
+      }
+
+      await tenant.update(updateData);
+      return res.status(200).json({ message: 'Tenant updated successfully', tenant });
+    } catch (err) {
+      next(err);
+    }
+  }
   async deleteTenant(req, res, next) {
     try {
       const { id } = req.params;
