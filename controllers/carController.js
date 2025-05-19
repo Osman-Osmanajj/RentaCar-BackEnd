@@ -23,6 +23,9 @@ class CarController {
           .status(409)
           .json({ message: 'A car with that license plate already exists' });
       }
+      ;
+      
+      
 
       const car = await Car.create({
         make,
@@ -48,28 +51,47 @@ class CarController {
   }
 
   /* ───────── DELETE /api/car/:id ───────── */
-  async deleteCar(req, res, next) {
-    try {
-      const { id } = req.params;          // id = carId
-      const { Car } = req.tenantModels;
+ async deleteCar(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { Car, CarImage } = req.tenantModels;
 
-      const car = await Car.findByPk(id);
-      if (!car) {
-        return res.status(404).json({ message: 'Car not found' });
-      }
-
-      await car.destroy();
-      return res.status(200).json({ message: 'Car deleted successfully' });
-    } catch (err) {
-      next(err);
+    const car = await Car.findByPk(id);
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
     }
+
+    const carImage = await CarImage.findOne({ where: { car_id: id } });
+    if (carImage) {
+      await carImage.destroy();
+    }
+
+    await car.destroy();
+
+    return res.status(200).json({ message: 'Car deleted successfully' });
+  } catch (err) {
+    next(err);
   }
+}
+
 
   /* ───────── GET /api/car/all ───────── */
   async getCars(req, res, next) {
     try {
-      const { Car } = req.tenantModels;
-      const cars = await Car.findAll();
+      const { Car,CarImage,CarType } = req.tenantModels;
+      const cars = await Car.findAll({
+        include: [
+          {
+            model: CarImage,
+            attributes: ['image_url'],
+          },
+          {
+            model: CarType,
+            attributes: ['name'],
+          }
+        ]
+
+      });
 
       if (!cars.length) {
         return res.status(404).json({ message: 'No cars found' });
@@ -106,15 +128,22 @@ class CarController {
   /* ───────── PATCH /api/car/:id ───────── */
   async updateCarById(req, res, next) {
     try {
-      const { id } = req.params;          // id = carId
+      const { id } = req.params;          
       const updateData = req.body;
-      const { Car } = req.tenantModels;
+      const { Car,CarImage } = req.tenantModels;
 
       const car = await Car.findByPk(id);
       if (!car) {
         return res.status(404).json({ message: 'Car not found' });
       }
-
+      const { image_url } = updateData;
+      if (image_url) {
+        const carImage = await CarImage.findOne({ where: { car_id: id } });
+        if (!carImage) {
+          return res.status(404).json({ message: 'Car image not found' });
+        }
+        await carImage.update({ image_url });
+      }
       await car.update(updateData);
       return res
         .status(200)
