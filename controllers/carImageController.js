@@ -45,6 +45,27 @@ class CarImageController {
       next(error);
     }
   }
+
+  // updateCarImage
+  async updateCarImage(req, res, next) {
+    try {
+      const { id } = req.params; // id = imageId
+      const { image_url } = req.body;
+      const { CarImage } = req.tenantModels;
+
+      const image = await CarImage.findByPk(id);
+
+      if (!image) {
+        return res.status(404).json({ message: 'Car image not found' });
+      }
+
+      await image.update({ image_url });
+
+      res.status(200).json({ message: 'Car image updated successfully', image });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const carImageController = new CarImageController();
