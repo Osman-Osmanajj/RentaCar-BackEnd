@@ -61,7 +61,7 @@ app.use('/api/carimage',    authenticateJWT, tenantMiddleware, carimageRoutes);
 app.use('/api/payment',     authenticateJWT, tenantMiddleware, paymentRoutes);
 
 // ── Protected user/admin routes ─────────────────────────────────────
-app.use('/api/user',      authenticateJWT, userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/useradmin', authenticateJWT, userAdminRoutes);
 app.use('/api/super', superAdminRoutes);
 

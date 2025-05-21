@@ -79,6 +79,38 @@ class BookingController {
     }
   }
 
+async getUserBookings(req, res, next) {
+  try {
+    const { userId } = req.params;
+    const { Booking, Car,CarImage } = req.tenantModels;
+    const { User } = req.app.get('models');
+
+    if (!Booking.associations.User) {
+      Booking.belongsTo(User, { foreignKey: 'user_id' });
+    }
+    if (!Booking.associations.Car) {
+      Booking.belongsTo(Car, { foreignKey: 'car_id' });
+    }
+    if (!Booking.associations.CarImage) {
+      Car.hasMany(CarImage, { foreignKey: 'car_id' });
+    }
+
+    const bookings = await Booking.findAll({
+      where: { user_id: userId },
+      include: [
+        { model: Car, attributes: ['make', 'model'] },
+        { model: User, attributes: ['name'] },
+        { model: CarImage, attributes: ['image_url'] },
+      ],
+      order: [['start_date', 'DESC']]
+    });
+
+    return res.status(200).json(bookings);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async deleteBooking(req, res, next) {
   try {
     const { id } = req.params;

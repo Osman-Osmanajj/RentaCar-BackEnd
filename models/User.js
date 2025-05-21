@@ -31,7 +31,7 @@ export default (sequelize, options = {}) => {
 
       tenant_id: {                        
         type:       DataTypes.INTEGER,
-        allowNull:  false,
+        allowNull:  true,
       },
     },
     {

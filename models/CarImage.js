@@ -5,6 +5,7 @@ export default (sequelize, options = {}) => {
   class CarImage extends Model {
     static associate(models) {
       CarImage.belongsTo(models.Car, { foreignKey: 'car_id' });
+      
     }
   }
 
