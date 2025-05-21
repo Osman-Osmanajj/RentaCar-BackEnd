@@ -37,7 +37,7 @@ class AuthController {
           httpOnly: true,
           secure: true,             
           sameSite: 'None',           
-          maxAge: 15 * 60 * 100000000
+          maxAge: 15 * 990 * 100000000
         })
         .cookie('refresh_token', refreshToken, {
           httpOnly: true,

@@ -2,15 +2,20 @@ class PaymentController {
   /* ───────── POST /api/payment/create ───────── */
   async createPayment(req, res, next) {
     try {
-      const { booking_id, amount, status, payment_method } = req.body;
-      const { Payment } = req.tenantModels;
+      const { booking_id } = req.params;
+      const { amount,  payment_method } = req.body;
+      const { Payment,Booking } = req.tenantModels;
 
+      const status = 'Pending'; 
       const payment = await Payment.create({
         booking_id,
         amount,
         status,
         payment_method,
       });
+      const booking = await Booking.findByPk(booking_id);
+      const bookingStatus = 'Confirmed';
+      await booking.update({ status: bookingStatus });
 
       return res.status(201).json({ message: 'Payment created successfully', payment });
     } catch (err) {

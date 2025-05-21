@@ -5,6 +5,11 @@ export default (sequelize, options = {}) => {
   class Booking extends Model {
     static associate(models) {
       Booking.belongsTo(models.Car, { foreignKey: 'car_id' });
+      Booking.hasMany(models.CarImage, {
+            foreignKey: 'car_id',   // The field in CarImage table
+            sourceKey: 'car_id',    // The field in Booking table
+          });
+
     }
   }
 

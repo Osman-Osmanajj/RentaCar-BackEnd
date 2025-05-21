@@ -3,7 +3,7 @@ import { paymentController } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
-router.post('/create', paymentController.createPayment.bind(paymentController));
+router.post('/create/:booking_id', paymentController.createPayment.bind(paymentController));
 router.get('/all', paymentController.getPayments.bind(paymentController));
 router.delete('/:paymentId', paymentController.deletePayment.bind(paymentController));
 

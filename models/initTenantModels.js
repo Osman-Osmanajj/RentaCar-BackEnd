@@ -29,7 +29,7 @@ export const initTenantModels = (schemaName) => {
 
 
     Car.associate({ CarType, Booking, CarImage, CarDamageReport, MaintenanceRecord });
-    Booking.associate({ Car, Payment, Review });
+    Booking.associate({ Car, Payment, Review, CarImage });
     CarDamageReport.associate({ Car });
     CarImage.associate({ Car });
     CarType.associate({ Car });
