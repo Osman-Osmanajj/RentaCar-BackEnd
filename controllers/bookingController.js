@@ -152,7 +152,12 @@ async deleteBooking(req, res, next) {
       ],
 
     });
-
+    for (const booking of bookings) {
+      if (new Date(booking.end_date) < new Date() && booking.status !== 'Completed') {
+       const bookingstatus = 'Completed';
+        await booking.update({ status: bookingstatus });
+      }
+    }
     return res.status(200).json(bookings);
   } catch (err) {
     next(err);
@@ -171,7 +176,9 @@ async getCostumersBasedOnbooking(req, res, next) {
 
     // Fetch only completed bookings with associated User
     const bookings = await Booking.findAll({
-      where: { status: 'Completed' },
+      where: {
+        status: 'Completed', // Adjust this condition as needed
+      },
       include: [
         {
           model: User,
@@ -179,7 +186,7 @@ async getCostumersBasedOnbooking(req, res, next) {
         },
       ],
     });
-
+    
     // Map to unique customers based on email
     const allCustomers = bookings.map((booking) => ({
       name: booking.User.name,

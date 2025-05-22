@@ -29,6 +29,7 @@ export class UserAdminController {
       next(err);                           
     }
   }
+  
 }
 
 export const userAdminController = new UserAdminController();

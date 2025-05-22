@@ -128,6 +128,19 @@ module.exports = {
             status      VARCHAR(50)
           )
         $fmt$, schema_name, schema_name);
+        EXECUTE format($fmt$
+          INSERT INTO %I.car_types (name, description)
+          SELECT *
+          FROM (
+            VALUES
+              ('Sedan','A comfortable four-door vehicle ideal for city and highway driving, offering a smooth ride and excellent fuel efficiency'),
+              ('SUV','Sport Utility Vehicle blending passenger comfort with off-road capability and generous cargo capacity'),
+              ('Coupe','A stylish two-door model with a sporty profile, designed for dynamic handling and spirited performance'),
+              ('Van','A spacious multi-passenger vehicle perfect for group travel or hauling gear, with flexible seating and storage'),
+              ('Convertible','A sleek vehicle featuring a retractable roof, delivering an exhilarating open-air driving experience')
+          ) AS vals(name, description)
+          WHERE NOT EXISTS (SELECT 1 FROM %I.car_types)
+        $fmt$, schema_name, schema_name);
 
       END;
       $$ LANGUAGE plpgsql;
