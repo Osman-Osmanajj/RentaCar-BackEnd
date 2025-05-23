@@ -33,11 +33,13 @@ class AuthController {
       );
 
       
+
+      
      res.cookie('access_token', accessToken, {
           httpOnly: true,
           secure: true,             
           sameSite: 'None',           
-          maxAge: 15 * 990 * 100000000
+          maxAge:  30 * 24 * 60 * 60 * 1000
         })
         .cookie('refresh_token', refreshToken, {
           httpOnly: true,

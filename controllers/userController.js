@@ -1,4 +1,5 @@
 import { hashPassword } from '../utils/passwordHash.js';
+import bcrypt from 'bcrypt';
 
 /* helper so the global error handler can pick the status code */
 class HttpError extends Error {
@@ -56,7 +57,23 @@ class UserController {
       const { id } = req.params;
       const updateData = req.body;
       const { User } = req.app.get('models');
+      const { newPassword,oldpassword } = updateData;
+      console.log('updateData', updateData);
 
+      if (oldpassword) {
+        const user = await User.findByPk(id);
+        console.log('user', user);
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+        const valid = await bcrypt.compare(oldpassword, user.password);
+        console.log(user.password, oldpassword, valid);
+        if (!valid) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const newPasswordHashed = await hashPassword(newPassword);
+        await user.update({ password: newPasswordHashed });
+      }
       const user = await User.findByPk(id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
