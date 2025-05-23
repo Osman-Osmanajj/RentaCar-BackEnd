@@ -49,7 +49,7 @@ cd ssh-projekti/backend
 
 # 2. Instalo varësitë
 npm install express sequelize pg pg-hstore dotenv jsonwebtoken bcryptjs cors
-npm install swagger-ui-express
+npm install swagger-ui-express swagger-jsdoc
 npm install express-validator
 npm install cookie-parser
 
