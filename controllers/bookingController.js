@@ -212,8 +212,6 @@ async getCostumersBasedOnbooking(req, res, next) {
   }
 }
 
-
-
 async updateBooking(req, res, next) {
   try {
     const { id } = req.params;
@@ -225,13 +223,33 @@ async updateBooking(req, res, next) {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
+    const newStart = updateData.start_date || booking.start_date;
+    const newEnd   = updateData.end_date   || booking.end_date;
+
+   
+    const overlapping = await Booking.findOne({
+      where: {
+        id: { [Op.ne]: id },
+        car_id: booking.car_id,
+        status: { [Op.ne]: 'Cancelled' },
+        start_date: { [Op.lte]: newEnd },   
+        end_date:   { [Op.gte]: newStart },   
+      },
+    });
+
+    if (overlapping) {
+      return res.status(409).json({
+        message: 'Car is already booked for some or all of the requested period'
+      });
+    }
+
     await booking.update(updateData);
     return res.status(200).json({ message: 'Booking updated successfully', booking });
   } catch (err) {
     next(err);
   }
-
 }
+
 }
 
 export const bookingController = new BookingController();

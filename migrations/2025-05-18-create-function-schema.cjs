@@ -110,7 +110,7 @@ module.exports = {
         EXECUTE format($fmt$
           CREATE TABLE IF NOT EXISTS %I.maintenance_records (
             id SERIAL PRIMARY KEY,
-            car_id        INT REFERENCES %I.cars(id),
+            car_id        INT REFERENCES %I.cars(id) ON DELETE CASCADE,
             service_type  VARCHAR(100),
             service_date  DATE,
             description   TEXT,
