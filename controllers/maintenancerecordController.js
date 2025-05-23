@@ -61,7 +61,7 @@ async getRecordInvoice(req, res, next) {
 
     const record = await MaintenanceRecord.findOne({
       where: { id: recordId },
-      include: [{ model: Car, as: 'car' }]
+      include: [{ model: Car}]
     });
 
     if (!record) {

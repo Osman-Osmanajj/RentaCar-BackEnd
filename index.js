@@ -24,6 +24,8 @@ import { errorHandler }         from './middlewares/errorHandler.js';
 import { tenantMiddleware }     from './middlewares/tenantMiddleware.js';
 import { authenticateJWT }      from './middlewares/authenticateJWT.js';
 import superAdminRoutes from './routes/superAdminRoutes.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swaggerSpec.js'; // ose rruga ku e ke fajllin
 
 const app = express();
 
@@ -69,6 +71,8 @@ app.use('/api/super', authenticateJWT, superAdminRoutes);
 
 // global error handler
 app.use(errorHandler);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(3000, () => {
   console.log('Server running on port 3000');

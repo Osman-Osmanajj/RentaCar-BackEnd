@@ -7,10 +7,10 @@ class ReviewController {
         car_id,
         rating,
         comment,
-        user_id: bodyUserId,          // optional in body
+        user_id: bodyUserId,          
       } = req.body;
 
-      // user id can come from JWT middleware or request body
+      
       const user_id = bodyUserId ?? req.user?.id;
       if (!user_id) {
         return res.status(400).json({ message: 'user_id is required' });
@@ -54,24 +54,29 @@ class ReviewController {
     }
   }
 
-  /* ───────── DELETE /api/review/:id ───────── */
-  async deleteReview(req, res, next) {
+  async getReviewsByCarId(req, res, next) {
     try {
-      const { id } = req.params;       // id = reviewId
+      const { car_id } = req.params;
       const { Review } = req.tenantModels;
-
-      const review = await Review.findByPk(id);
-      if (!review) {
-        return res.status(404).json({ message: 'Review not found' });
+      if (!car_id) {
+        return res.status(400).json({ message: 'car_id is required' });
       }
 
-      await review.destroy();
-      return res
-        .status(200)
-        .json({ message: 'Review deleted successfully' });
+      const reviews = await Review.findAll({
+        where: { car_id },
+        
+        order: [['created_at', 'DESC']],
+      });
+
+      if (!reviews.length) {
+        return res.status(200).json({ message: 'No reviews found' });
+      }
+
+      return res.status(200).json(reviews);
     } catch (err) {
       next(err);
     }
+
   }
 }
 
