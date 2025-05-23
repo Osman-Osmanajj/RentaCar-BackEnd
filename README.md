@@ -48,7 +48,11 @@ git clone https://github.com/emri/ssh-projekti.git
 cd ssh-projekti/backend
 
 # 2. Instalo varësitë
-npm install
+npm install express sequelize pg pg-hstore dotenv jsonwebtoken bcryptjs cors
+npm install swagger-ui-express
+npm install express-validator
+npm install cookie-parser
+
 
 # 3. Konfiguro .env
 cp .env.example .env
@@ -58,7 +62,7 @@ cp .env.example .env
 npx sequelize-cli db:migrate
 
 # 5. Starto serverin
-npc nodemon index
+npx nodemon index
 ```
 
 ---
