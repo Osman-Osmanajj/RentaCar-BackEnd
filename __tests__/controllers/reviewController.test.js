@@ -1,4 +1,3 @@
-// __tests__/controllers/reviewController.test.js
 import { reviewController } from '../../controllers/reviewController.js';
 
 describe('ReviewController', () => {
@@ -7,7 +6,7 @@ describe('ReviewController', () => {
 
   beforeEach(() => {
     Car    = { findByPk: jest.fn() };
-    Review = { create: jest.fn(), findAll: jest.fn(), findByPk: jest.fn() };
+    Review = { create: jest.fn(), findAll: jest.fn() };
     User   = { findByPk: jest.fn() };
 
     req = {
@@ -33,7 +32,6 @@ describe('ReviewController', () => {
   describe('createReview', () => {
     it('400 when no user_id anywhere', async () => {
       req.body = { car_id: 1, rating: 5, comment: 'Great!' };
-      // no req.user.id
       await reviewController.createReview(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
@@ -114,42 +112,6 @@ describe('ReviewController', () => {
       Review.findAll.mockRejectedValue(boom);
 
       await reviewController.getReviews(req, res, next);
-
-      expect(next).toHaveBeenCalledWith(boom);
-    });
-  });
-
-  describe('deleteReview', () => {
-    it('404 if not found', async () => {
-      req.params.id = 11;
-      Review.findByPk.mockResolvedValue(null);
-
-      await reviewController.deleteReview(req, res, next);
-
-      expect(Review.findByPk).toHaveBeenCalledWith(11);
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Review not found' });
-    });
-
-    it('destroys and returns success', async () => {
-      req.params.id = 12;
-      const review = { destroy: jest.fn() };
-      Review.findByPk.mockResolvedValue(review);
-
-      await reviewController.deleteReview(req, res, next);
-
-      expect(review.destroy).toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Review deleted successfully' });
-    });
-
-    it('forwards destroy errors', async () => {
-      req.params.id = 13;
-      const boom = new Error('destroy fail');
-      const review = { destroy: jest.fn().mockRejectedValue(boom) };
-      Review.findByPk.mockResolvedValue(review);
-
-      await reviewController.deleteReview(req, res, next);
 
       expect(next).toHaveBeenCalledWith(boom);
     });

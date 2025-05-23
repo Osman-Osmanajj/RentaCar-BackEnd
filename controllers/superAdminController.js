@@ -17,6 +17,9 @@ async createTenant(req, res, next) {
   try {
     const { name, email, phone, address, city, country } = req.body;
     const { Tenant } = req.app.get('models');
+    if (!name) {
+      throw new Error('Name is required');
+    }
     const schema_name = `tenant_${name.toLowerCase().replace(/\s+/g, '_')}`;
     const tenant = await Tenant.create({ name, email, phone, address, city, country, schema_name });
     return res.status(201).json({ message: 'Tenant created', tenant });
